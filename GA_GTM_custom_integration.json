@@ -1,0 +1,60 @@
+{
+  "plugin_type": "analytics_integration",
+  "name": "GA GTM custom integration",
+  "form_schema": [
+    {
+      "default_value": "dimension65",
+      "field_type": "dropdown",
+      "name": "customDimension",
+      "label": "Custom Dimension",
+      "options": {
+        "choices": [
+          {
+            "value": "dimension65",
+            "label": "Dimension 65"
+          },
+          {
+            "value": "dimension66",
+            "label": "Dimension 66"
+          },
+          {
+            "value": "dimension67",
+            "label": "Dimension 67"
+          },
+          {
+            "value": "dimension68",
+            "label": "Dimension 68"
+          },
+          {
+            "value": "dimension69",
+            "label": "Dimension 69"
+          },
+          {
+            "value": "dimension70",
+            "label": "Dimension 70"
+          },
+          {
+            "value": "dimension71",
+            "label": "Dimension 71"
+          },
+          {
+            "value": "dimension72",
+            "label": "Dimension 72"
+          },
+          {
+            "value": "dimension73",
+            "label": "Dimension 73"
+          },
+          {
+            "value": "dimension74",
+            "label": "Dimension 74"
+          }
+        ]
+      }
+    }
+  ],
+  "description": "",
+  "options": {
+    "track_layer_decision": "/*\n* Javascript written in this tab will run every time a user is\n* assigned to an experiment and variation, but before any experiment\n* code runs. This hook is useful for tracking which variations a\n * visitor has been assigned to. Click the help icon for more information.\n */\n\nvar logEnabled = false;\nvar debugEvents = true;\nvar timeoutInterval = 100;\nvar maxWait = 10000;\nvar waited = 0;\n\nfunction trackOptlyEvent(name, tags){\n    try {\n        if(debugEvents){\n            tags = tags || {};\n            window.optimizely.push({\n                \"type\": \"event\",\n                \"eventName\": name,\n                \"tags\": tags\n            });\n        }\n    } catch (error) {\n        // console.log(error);\n    }\n}\n\ntry {\n    (function(){\n        function integrationLog(msg){\n            if (logEnabled){\n                console.log(msg);\n            }\n        }\n\n        function waitForGaEventApi(method) {\n            if (window.ga && window.ga.getAll) {\n                method();\n            } else {\n                if (waited < maxWait){\n                    setTimeout(function() {\n                        waited = waited + timeoutInterval;\n                        waitForGaEventApi(method);\n                    }, timeoutInterval);\n                } else {\n                    trackOptlyEvent(\"failed_to_find_ga\");\n                }\n            }\n        }\n\n      \ttrackOptlyEvent(\"aa_test_activated\");\n        integrationLog(\"AA test activated\");\n\n        var decisionString = optimizely.get('state').getDecisionString({\n            campaignId: campaignId,\n            shouldCleanString: true,\n            maxLength: 255\n        });\n\n        waitForGaEventApi(function(){\n            if(!!decisionString) {\n                integrationLog(\"Sending decision event to GA\");\n              // send event to GA\n              \tvar fieldsObject = {nonInteraction: true};\n\t\t\t\t\t\t\t\tfieldsObject[extension.customDimension] = decisionString;\n              \tintegrationLog(fieldsObject);\n\n              \tvar prefix = window.ga.getAll()[0].get('name');\n\n                integrationLog(prefix);\n              \twindow.ga(prefix+'.set', extension.customDimension, decisionString);\n              \ttrackOptlyEvent(\"set_ga_event\");\n    \t\t\t\t\t\twindow.ga(prefix+'.send', \"event\", \"Optimizely\", \"User Bucketed\", fieldsObject);\n                trackOptlyEvent(\"sent_ga_event\",{\n                  value: waited\n                });\n            }\n        });\n    })();\n} catch (error) {\n    trackOptlyEvent(\"ga_error\",{\n        errormessage: error.message\n    });\n}\n\n"
+  }
+}
