@@ -12,13 +12,19 @@ Create a custom analytics integration: https://help.optimizely.com/Integrate_Oth
 Create custom dimensions in GA for Optimizely experiments, each experiment that is running at the same time needs it’s own custom dimension.
 Adjust the custom analytics integration to use your own defined custom dimensions.
 Create the following custom events under Implementation>Events:
+
 I. aa_test_activated
+
 II. set_ga_event
+
 III. sent_ga_event
+
 IV. failed_to_find_ga
+
 V. ga_error
 
 Set up an A/A test to test the integration:
+
 I. Create an experiment that runs on all pages, so you can check GA and Optimizely on your complete website.
 
 II. Add the integration to the experiment.
